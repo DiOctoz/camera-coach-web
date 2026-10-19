@@ -4,7 +4,9 @@ export default defineConfig({
   testDir: 'tests',
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: process.env.CI
+    ? [['github'], ['list'], ['html', { open: 'never' }]]
+    : [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:5173',
     // Cho phép camera không cần hỏi và dùng camera giả của Chromium (khung hình test có hình động).
