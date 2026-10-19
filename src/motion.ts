@@ -19,20 +19,21 @@ export class Motion {
    * cảm biến khi được gọi từ một thao tác của người dùng.
    */
   async start(): Promise<boolean> {
-    if (this.listening) return true;
     if (typeof DeviceOrientationEvent === 'undefined') return false;
 
-    const ctor = DeviceOrientationEvent as unknown as OrientationPermission;
-    if (typeof ctor.requestPermission === 'function') {
-      try {
-        if ((await ctor.requestPermission()) !== 'granted') return false;
-      } catch {
-        return false;
-      }
+    // Gắn listener trước: nếu chưa có quyền thì đơn giản là không có sự kiện nào tới.
+    if (!this.listening) {
+      window.addEventListener('deviceorientation', this.handle);
+      this.listening = true;
     }
-    window.addEventListener('deviceorientation', this.handle);
-    this.listening = true;
-    return true;
+
+    const ctor = DeviceOrientationEvent as unknown as OrientationPermission;
+    if (typeof ctor.requestPermission !== 'function') return true;
+    try {
+      return (await ctor.requestPermission()) === 'granted';
+    } catch {
+      return false;
+    }
   }
 
   stop(): void {
