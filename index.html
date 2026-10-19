@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0d0f12" />
+    <title>Camera Coach</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <!-- Màn hình mở đầu: cần một lần chạm để trình duyệt cho phép camera, cảm biến và giọng đọc -->
+    <section id="start-screen" class="start" data-testid="start-screen">
+      <div class="start__inner">
+        <p class="start__eyebrow">Camera Coach</p>
+        <h1 class="start__title">AI nhìn khung ngắm và nói bạn cách chỉnh góc máy</h1>
+        <p class="start__body">
+          Đeo tai nghe, cầm máy dọc và ngắm. Khoảng mỗi vài giây, AI sẽ nói một chỉ dẫn ngắn như
+          “xoay máy sang trái một chút” hay “lùi lại một bước”.
+        </p>
+        <button id="start-btn" class="btn btn--primary" data-testid="start-btn">Bật camera</button>
+        <p id="start-error" class="start__error" role="alert" hidden></p>
+      </div>
+    </section>
+
+    <main id="app" class="app" hidden>
+      <header class="topbar">
+        <label class="subject">
+          <span class="visually-hidden">Chủ đề chụp</span>
+          <select id="subject" data-testid="subject"></select>
+        </label>
+        <button id="settings-btn" class="icon-btn" aria-label="Cài đặt" data-testid="settings-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm8.2-2.4.1-1.1-.1-1.1 2-1.6-2-3.4-2.4 1a8 8 0 0 0-1.9-1.1L15.5 3h-4l-.4 2.6a8 8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.6-.1 1.1.1 1.1-2 1.6 2 3.4 2.4-1c.6.5 1.2.8 1.9 1.1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.6Z"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <div class="stage">
+        <div id="viewfinder" class="viewfinder" data-testid="viewfinder">
+          <video id="preview" playsinline muted autoplay></video>
+          <div class="grid" aria-hidden="true"></div>
+          <div id="level" class="level" data-testid="level" hidden aria-hidden="true">
+            <span></span><i></i><span></span>
+          </div>
+          <div id="flash" class="flash" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <section id="instruction-card" class="card" data-state="off" aria-live="polite">
+        <span class="card__dot" aria-hidden="true"></span>
+        <div class="card__text">
+          <p id="instruction-text" data-testid="instruction">Bật AI để nghe hướng dẫn chỉnh góc máy.</p>
+          <p id="error-text" class="card__error" data-testid="error" hidden></p>
+          <p id="voice-warning" class="card__note" hidden>
+            Máy chưa có giọng đọc tiếng Việt nên trình duyệt sẽ dùng giọng mặc định.
+          </p>
+        </div>
+      </section>
+
+      <footer class="controls">
+        <button id="guide-btn" class="guide" aria-pressed="false" data-testid="guide-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3a8 8 0 0 0-8 8v6a3 3 0 0 0 3 3h1v-7H6v-2a6 6 0 0 1 12 0v2h-2v7h1a3 3 0 0 0 3-3v-6a8 8 0 0 0-8-8Z" />
+          </svg>
+          <span id="guide-label">Bật AI</span>
+        </button>
+        <button id="shutter-btn" class="shutter" aria-label="Chụp ảnh" data-testid="shutter-btn"></button>
+        <button id="thumb" class="thumb" aria-label="Lưu ảnh vừa chụp" data-testid="thumb" hidden>
+          <img id="thumb-img" alt="" />
+        </button>
+      </footer>
+    </main>
+
+    <dialog id="settings-dialog" class="dialog" data-testid="settings-dialog">
+      <form id="settings-form" class="dialog__form">
+        <h2>Cài đặt</h2>
+        <label class="field">
+          <span>Anthropic API key</span>
+          <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" data-testid="api-key" />
+          <small>Lấy key tại console.anthropic.com. Key chỉ lưu trong trình duyệt này.</small>
+        </label>
+        <label class="field">
+          <span>Mô hình AI</span>
+          <select id="model" data-testid="model"></select>
+        </label>
+        <label class="field">
+          <span>Nghỉ giữa các lần nhắc: <output id="pause-value">1,0</output> giây</span>
+          <input id="pause" type="range" min="0.5" max="5" step="0.5" data-testid="pause" />
+          <small>Nghỉ lâu hơn thì gọi AI ít hơn, đỡ tốn phí.</small>
+        </label>
+        <div class="dialog__actions">
+          <button type="button" id="settings-cancel" class="btn">Huỷ</button>
+          <button type="submit" class="btn btn--primary" data-testid="settings-save">Lưu</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" data-testid="toast" hidden></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

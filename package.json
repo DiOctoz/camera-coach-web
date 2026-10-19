@@ -1,0 +1,23 @@
+{
+  "name": "camera-coach-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Trợ lý chụp ảnh trên web: AI nhìn khung ngắm và đọc chỉ dẫn chỉnh góc máy bằng tiếng Việt.",
+  "scripts": {
+    "dev": "vite",
+    "dev:phone": "vite --host --mode phone",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0"
+  }
+}
